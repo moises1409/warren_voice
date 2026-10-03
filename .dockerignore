@@ -1,3 +1,6 @@
+# Frontend app (deployed as its own service)
+frontend/
+
 # Project tests
 test/
 tests/

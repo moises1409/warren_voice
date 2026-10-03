@@ -12,7 +12,8 @@ from livekit.agents import (
     inference,
     room_io,
 )
-from livekit.plugins import ai_coustics
+from livekit.plugins import ai_coustics, google
+from tools import lookup_weather
 
 logger = logging.getLogger("agent")
 
@@ -24,7 +25,13 @@ class Assistant(Agent):
         super().__init__(
             # A Large Language Model (LLM) is your agent's brain, processing user input and generating a response
             # See all available models at https://docs.livekit.io/agents/models/llm/
-            llm=inference.LLM(model="google/gemma-4-31b-it"),
+            #llm=inference.LLM(model="google/gemma-4-31b-it"),
+            llm=google.beta.realtime.RealtimeModel(
+                model="gemini-3.1-flash-live-preview",
+                voice="Enceladus",
+                language="en-GB",
+            ),
+            tools=[lookup_weather],
             # To use a realtime model instead of a voice pipeline, replace the LLM
             # with a RealtimeModel and remove the STT/TTS from the AgentSession
             # (Note: This is for the OpenAI Realtime API. For other providers, see https://docs.livekit.io/agents/models/realtime/)
@@ -35,7 +42,7 @@ class Assistant(Agent):
             #     llm=openai.realtime.RealtimeModel(voice="marin")
             instructions=textwrap.dedent(
                 """\
-                You are a friendly, reliable voice assistant that answers questions, explains topics, and completes tasks with available tools.
+                You are Warren, Your a banker voice assistant that answers questions, explains topics, and completes tasks with available tools.
 
                 # Output rules
 
@@ -101,14 +108,6 @@ async def my_agent(ctx: JobContext):
 
     # Set up a voice AI pipeline using AssemblyAI, Fish Audio, and the LiveKit turn detector
     session = AgentSession(
-        # Speech-to-text (STT) is your agent's ears, turning the user's speech into text that the LLM can understand
-        # See all available models at https://docs.livekit.io/agents/models/stt/
-        stt=inference.STT(model="assemblyai/universal-3-5-pro", language="en"),
-        # Text-to-speech (TTS) is your agent's voice, turning the LLM's text into speech that the user can hear
-        # See all available models as well as voice selections at https://docs.livekit.io/agents/models/tts/
-        tts=inference.TTS(
-            model="fishaudio/s2.1-pro", voice="fa4c9eb3dccc4806b382b40d61c6b10a"
-        ),
         turn_handling=TurnHandlingOptions(
             # The LiveKit turn detector determines when the user is done speaking and the agent should respond.
             # TurnDetector is an end-of-turn model that listens to the user's audio directly, combining
@@ -135,6 +134,7 @@ async def my_agent(ctx: JobContext):
         agent=Assistant(),
         room=ctx.room,
         room_options=room_io.RoomOptions(
+            video_input=True,
             audio_input=room_io.AudioInputOptions(
                 noise_cancellation=ai_coustics.audio_enhancement(
                     model=ai_coustics.EnhancerModel.QUAIL_VF_S
