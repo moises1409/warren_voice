@@ -1,5 +1,6 @@
 import { Public_Sans } from 'next/font/google';
 import localFont from 'next/font/local';
+import Link from 'next/link';
 import { ThemeProvider } from '@/components/app/theme-provider';
 import { ThemeToggle } from '@/components/app/theme-toggle';
 import { cn } from '@/lib/shadcn/utils';
@@ -53,8 +54,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
       )}
     >
       <head>
-        <title>LiveKit Voice Agent</title>
-        <meta name="description" content="A voice agent built with LiveKit" />
+        <title>Warren · Meeting preparation</title>
+        <meta name="description" content="Prepare client meetings with a voice assistant" />
       </head>
       <body className="overflow-x-hidden">
         <ThemeProvider
@@ -63,38 +64,17 @@ export default function RootLayout({ children }: RootLayoutProps) {
           enableSystem
           disableTransitionOnChange
         >
-          <header className="fixed top-0 left-0 z-50 hidden w-full flex-row justify-between p-6 md:flex">
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://livekit.io"
-              className="scale-100 transition-transform duration-300 hover:scale-110"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/lk-logo.svg" alt="LiveKit Logo" className="block size-6 dark:hidden" />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/lk-logo-dark.svg"
-                alt="LiveKit Logo"
-                className="hidden size-6 dark:block"
-              />
-            </a>
-            <span className="text-foreground font-mono text-xs font-bold tracking-wider uppercase">
-              Built with{' '}
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://docs.livekit.io/agents"
-                className="underline underline-offset-4"
-              >
-                LiveKit Agents
-              </a>
-            </span>
-          </header>
-
-          {children}
-          <div className="group fixed bottom-0 left-1/2 z-50 mb-2 -translate-x-1/2">
-            <ThemeToggle className="translate-y-20 transition-transform delay-150 duration-300 group-hover:translate-y-0" />
+          <div className="flex h-svh flex-col">
+            <header className="flex h-12 shrink-0 items-center justify-between border-b px-5">
+              <Link href="/" className="flex items-baseline gap-3">
+                <span className="text-foreground text-base font-semibold tracking-tight">
+                  Warren
+                </span>
+                <span className="text-muted-foreground text-xs">Meeting preparation</span>
+              </Link>
+              <ThemeToggle className="w-auto" />
+            </header>
+            <div className="min-h-0 flex-1">{children}</div>
           </div>
         </ThemeProvider>
       </body>

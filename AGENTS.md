@@ -10,6 +10,20 @@ This Python project uses the `uv` package manager. You should always use `uv` to
 
 All app-level code is in the `src/` directory. In general, simple agents can be constructed with a single `agent.py` file. Additional files can be added, but you must retain `agent.py` as the entrypoint (see the associated Dockerfile for how this is deployed).
 
+This project is Warren, a meeting-preparation assistant for private bankers; see @README.md and `docs/meeting-prep-design.md`. Layout:
+
+- `src/agent.py`: entrypoint. Loads the client named in the dispatch metadata, publishes state snapshots, registers the RPC methods.
+- `src/stages.py`: the three stage agents (wealth, family, report), their tools and the handoffs.
+- `src/prompts.py`: instructions, built from `knowledge/*.md` and the current state.
+- `src/store.py`, `src/models.py`: session state. Tools change state only through `PrepStore`.
+- `src/checks.py`: deterministic findings. `src/summary.py`, `src/fx.py`: totals and currency conversion.
+- `src/agenda.py`: the guided review as a list of steps derived from the meeting points. `src/sessions.py`, `src/seed.py`: where sessions are saved between conversations.
+- `src/succession.py`: what the client's death would cost and who inherits, computed from `rules/succession.yaml`. No model involved; never let the agent compute a tax.
+- `src/report.py`: the report; figures in code, wording from a text model.
+- `data/`: mock clients and settings, shared with `frontend/`. `frontend/lib/types.ts` mirrors `src/models.py`: change both together.
+
+A stage agent stays silent after a handoff unless its `on_enter` calls `generate_reply`. Tools must stay fast: Gemini 3.1 Live waits for the tool result before speaking.
+
 Be sure to maintain code formatting. You can use the ruff formatter/linter as needed: `uv run ruff format` and `uv run ruff check`.
 
 ## LiveKit Documentation
@@ -44,7 +58,7 @@ Voice AI agents are highly sensitive to excessive latency. For this reason, it's
 
 When possible, add tests for agent behavior. Add a scenario to `scenarios.yaml` and run it with `lk agent simulate --scenarios scenarios.yaml`. The scenarios run in CI on every merge to main; read the [simulations documentation](https://docs.livekit.io/agents/start/testing/simulations/) before editing them.
 
-For turn-level checks that don't need a live session, use the in-process [testing framework](https://docs.livekit.io/agents/start/testing/); `tests/test_agent.py` has a commented-out example. Run those with `uv run pytest`.
+For turn-level checks that don't need a live session, use the in-process [testing framework](https://docs.livekit.io/agents/start/testing/); `tests/test_agent.py` runs the stage agents this way against the production voice model, asserting on what ends up in the store. Run those with `uv run pytest`.
 
 Important: When modifying core agent behavior such as instructions, tool descriptions, and tasks/workflows/handoffs, never just guess what will work. Always use test-driven development (TDD) and begin by writing tests for the desired behavior. For instance, if you're planning to add a new tool, write one or more tests for the tool's behavior, then iterate on the tool until the tests pass correctly. This will ensure you are able to produce a working, reliable agent for the user.
 

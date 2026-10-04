@@ -1,0 +1,133 @@
+# Taxes on death, as applied by src/succession.py.
+#
+# ILLUSTRATIVE. These rules were written for the demo from general knowledge. They are
+# simplified and have not been reviewed by a tax professional. Replace them with rules
+# validated by the bank's tax team, then set `status: validated`; until then the screen
+# marks every figure as illustrative.
+#
+# A rule fires for an asset (layer: situs) or for an heir (layer: heir).
+#   when        what the rule applies to
+#   per         heir   -> computed on each heir's part, with that heir's allowance
+#               estate -> computed once on the whole, then shared between the heirs
+#   allowance   amount free of tax, by relation to the deceased; `exempt` means no tax
+#   brackets    progressive scale: [upper limit, rate] on the part above the allowance;
+#               the last limit is null. A flat tax is a single bracket.
+#   currency    of the allowance and the limits
+#   low_factor  share of the result used as the low end of the range (1 when omitted).
+#               0 means relief may remove the tax entirely: the screen then says "up to".
+#   expert      who should look at it: tax_succession, us_cross_border, relocation
+
+version: 2026-10-demo
+status: illustrative
+
+experts:
+  tax_succession: Tax and succession planning
+  us_cross_border: US cross-border
+  relocation: Relocation
+
+# What the simulation takes for granted. Shown on screen with every result.
+assumptions:
+  - Swiss succession law applies and there is no will or inheritance contract.
+  - The estate is the client's share of the assets less the liabilities; the matrimonial property regime is not liquidated first.
+  - Each heir receives their share of every asset.
+  - Swiss cantonal inheritance tax is treated as nil for a spouse and for descendants.
+  - Where a country taxes the asset and another taxes the heir, the higher of the two is counted, not the sum.
+  - Pension plans are left out; they follow their own beneficiary rules.
+
+schedules:
+  fr_direct_line: &fr_direct_line
+    - [8072, 0.05]
+    - [12109, 0.10]
+    - [15932, 0.15]
+    - [552324, 0.20]
+    - [902838, 0.30]
+    - [1805677, 0.40]
+    - [null, 0.45]
+  es_state_scale: &es_state_scale
+    - [50000, 0.09]
+    - [150000, 0.15]
+    - [400000, 0.215]
+    - [800000, 0.295]
+    - [null, 0.34]
+  us_estate: &us_estate
+    - [100000, 0.24]
+    - [500000, 0.32]
+    - [1000000, 0.37]
+    - [null, 0.40]
+
+rules:
+  - id: fr-real-estate
+    layer: situs
+    topic: French real estate held directly by a non-resident
+    country: FR
+    when: { situs: FR, asset_types: [real_estate], holding_not: [company] }
+    per: heir
+    currency: EUR
+    allowance: { child: 100000, spouse: exempt }
+    brackets: *fr_direct_line
+    expert: tax_succession
+    source: "Illustrative: French inheritance tax scale for the direct line (top band 45%), non-resident owner of French property."
+
+  - id: es-real-estate
+    layer: situs
+    topic: Spanish real estate held by a non-resident
+    country: ES
+    when: { situs: ES, asset_types: [real_estate], holding_not: [company] }
+    per: heir
+    currency: EUR
+    allowance: { child: 16000, spouse: 16000 }
+    brackets: *es_state_scale
+    expert: tax_succession
+    source: "Illustrative: Spanish state inheritance tax scale for non-residents; regional reliefs ignored."
+
+  - id: us-situs
+    layer: situs
+    topic: US-situs assets held by a non-US person
+    country: US
+    # Bank deposits of a non-US person are outside the US estate tax, so cash is left out.
+    # A fund domiciled outside the US has another situs and never reaches this rule.
+    when: { situs: US, asset_types_not: [cash] }
+    per: estate
+    currency: USD
+    allowance: { any: 60000 }
+    brackets: *us_estate
+    low_factor: 0
+    expert: us_cross_border
+    source: "Illustrative: US estate tax for non-resident aliens (USD 60,000 exemption, top rate 40%). The Swiss-US treaty can reduce it, hence 'up to'."
+
+  - id: uk-situs
+    layer: situs
+    topic: UK-situs assets
+    country: GB
+    when: { situs: GB }
+    per: estate
+    currency: GBP
+    allowance: { any: 325000, spouse: exempt }
+    brackets:
+      - [null, 0.40]
+    expert: tax_succession
+    source: "Illustrative: UK inheritance tax on UK-situs assets (nil-rate band GBP 325,000, 40%)."
+
+  - id: fr-heir
+    layer: heir
+    topic: Heir resident in France
+    country: FR
+    when: { heir_residence: FR }
+    per: heir
+    currency: EUR
+    allowance: { child: 100000, spouse: exempt }
+    brackets: *fr_direct_line
+    expert: relocation
+    source: "Illustrative: France taxes what its long-term residents inherit, wherever the assets are."
+
+  - id: es-heir
+    layer: heir
+    topic: Heir resident in Spain
+    country: ES
+    when: { heir_residence: ES }
+    per: heir
+    currency: EUR
+    allowance: { child: 16000, spouse: 16000 }
+    brackets: *es_state_scale
+    expert: relocation
+    source: "Illustrative: Spain taxes what its residents inherit, wherever the assets are; regional reliefs ignored."
