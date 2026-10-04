@@ -1,0 +1,433 @@
+{
+  "clients": [
+    {
+      "client": {
+        "id": "c-001",
+        "name": "Elena Brunner",
+        "dateOfBirth": "1972-03-14",
+        "domicile": {
+          "city": "Zürich",
+          "country": "CH"
+        },
+        "segment": "Entrepreneur",
+        "riskScore": "Medium",
+        "performanceYtdPct": 6.4,
+        "lastContact": "2026-08-21"
+      },
+      "assets": [
+        { "id": "ast-1", "bankable": true, "type": "cash", "label": "Current and savings accounts", "amount": 850000, "currency": "CHF", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-2", "bankable": true, "type": "equities", "label": "Swiss equity mandate", "amount": 4200000, "currency": "CHF", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-3", "bankable": true, "type": "bonds", "label": "CHF bond portfolio", "amount": 1900000, "currency": "CHF", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-4", "bankable": true, "type": "funds", "label": "Global equity funds", "amount": 1500000, "currency": "USD", "country": "CH", "bank": "Warren & Cie", "situs": "IE", "holding": "fund" },
+        { "id": "ast-5", "bankable": false, "type": "business_stake", "label": "Brunner Medtech AG (65% stake)", "amount": 18000000, "currency": "CHF", "country": "CH", "bank": null },
+        { "id": "ast-6", "bankable": false, "type": "real_estate", "label": "Family home, Küsnacht", "amount": 4500000, "currency": "CHF", "country": "CH", "bank": null },
+        { "id": "ast-7", "bankable": false, "type": "real_estate", "label": "Holiday apartment, Mallorca", "amount": 1600000, "currency": "EUR", "country": "ES", "bank": null }
+      ],
+      "liabilities": [
+        { "id": "lia-1", "type": "mortgage", "label": "Mortgage, Küsnacht", "amount": 2000000, "currency": "CHF", "country": "CH", "bank": "Zürcher Kantonalbank", "securedByAssetId": "ast-6" },
+        { "id": "lia-2", "type": "lombard_loan", "label": "Lombard loan", "amount": 500000, "currency": "CHF", "country": "CH", "bank": "Warren & Cie", "securedByAssetId": null }
+      ],
+      "pensions": [
+        { "id": "pen-1", "type": "pillar_2", "provider": "Brunner Medtech pension fund", "amount": 1100000, "currency": "CHF", "country": "CH" },
+        { "id": "pen-2", "type": "pillar_3a", "provider": "Warren & Cie", "amount": 210000, "currency": "CHF", "country": "CH" }
+      ],
+      "cashFlows": [
+        { "id": "cf-1", "direction": "income", "frequency": "recurring", "type": "salary", "label": "CEO salary", "amount": 420000, "currency": "CHF", "date": null },
+        { "id": "cf-2", "direction": "income", "frequency": "recurring", "type": "dividend", "label": "Brunner Medtech dividend", "amount": 600000, "currency": "CHF", "date": null },
+        { "id": "cf-3", "direction": "expense", "frequency": "recurring", "type": "living_costs", "label": "Household", "amount": 280000, "currency": "CHF", "date": null },
+        { "id": "cf-4", "direction": "expense", "frequency": "recurring", "type": "taxes", "label": "Income and wealth tax", "amount": 310000, "currency": "CHF", "date": null }
+      ],
+      "family": {
+        "maritalStatus": "married",
+        "hasChildren": true,
+        "members": [
+          { "id": "fam-1", "relation": "spouse", "name": "Markus Brunner", "birthYear": 1970, "residence": {"city": "Zürich", "country": "CH"}, "otherParentId": null, "notes": "Co-owner of the family home" },
+          { "id": "fam-2", "relation": "child", "name": "Lea Brunner", "birthYear": 2001, "residence": {"city": "London", "country": "GB"}, "otherParentId": "fam-1", "notes": "Works in finance" },
+          { "id": "fam-3", "relation": "child", "name": "Jonas Brunner", "birthYear": 2005, "residence": {"city": "Zürich", "country": "CH"}, "otherParentId": "fam-1", "notes": "Studying engineering at ETH" }
+        ],
+        "maritalRegime": "participation_in_acquisitions",
+        "hasWill": false
+      },
+      "activityNotes": [
+        {
+          "id": "note-1",
+          "date": "2026-05-12",
+          "author": "Relationship manager",
+          "text": "Lunch with Elena. She still holds about CHF 4 million with Julius Baer, from before she sold her first company. Open to consolidating at some point, no rush.",
+          "facts": [
+            { "id": "c-001-ext", "section": "wealth", "summary": "about CHF 4 million held with Julius Baer", "expect": {"kind": "external_assets", "amount": 4000000, "currency": "CHF", "bank": "Julius Baer"} }
+          ]
+        },
+        {
+          "id": "note-2",
+          "date": "2026-08-21",
+          "author": "Relationship manager",
+          "text": "Call on the half-year performance. Lea has moved to London for work and likes it there.",
+          "facts": [
+            { "id": "c-001-lea", "section": "family", "summary": "Lea now lives in London", "expect": {"kind": "member_residence", "name": "Lea", "country": "GB"} }
+          ]
+        }
+      ]
+    },
+    {
+      "client": {
+        "id": "c-002",
+        "name": "James Whitfield",
+        "dateOfBirth": "1968-11-02",
+        "domicile": {
+          "city": "Zug",
+          "country": "CH"
+        },
+        "segment": "Top Executive",
+        "riskScore": "High",
+        "performanceYtdPct": -2.1,
+        "lastContact": "2026-02-10"
+      },
+      "assets": [
+        { "id": "ast-1", "bankable": true, "type": "cash", "label": "Current account", "amount": 300000, "currency": "CHF", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-2", "bankable": true, "type": "equities", "label": "US equity portfolio", "amount": 2800000, "currency": "USD", "country": "CH", "bank": "Warren & Cie", "situs": "US", "holding": "direct" },
+        { "id": "ast-3", "bankable": true, "type": "structured_products", "label": "Barrier reverse convertibles", "amount": 600000, "currency": "CHF", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-4", "bankable": true, "type": "equities", "label": "Employer shares (vested)", "amount": 3200000, "currency": "USD", "country": "US", "bank": "Morgan Stanley", "situs": "US", "holding": "direct" },
+        { "id": "ast-5", "bankable": true, "type": "cash", "label": "UK savings", "amount": 400000, "currency": "GBP", "country": "GB", "bank": "Barclays", "situs": "GB" },
+        { "id": "ast-6", "bankable": false, "type": "real_estate", "label": "Home, Zug", "amount": 3800000, "currency": "CHF", "country": "CH", "bank": null }
+      ],
+      "liabilities": [
+        { "id": "lia-1", "type": "mortgage", "label": "Mortgage, Zug", "amount": 2400000, "currency": "CHF", "country": "CH", "bank": "UBS", "securedByAssetId": "ast-6" }
+      ],
+      "pensions": [
+        { "id": "pen-1", "type": "pillar_2", "provider": "Employer pension fund", "amount": 1900000, "currency": "CHF", "country": "CH" },
+        { "id": "pen-2", "type": "foreign_pension", "provider": "UK SIPP", "amount": 350000, "currency": "GBP", "country": "GB" }
+      ],
+      "cashFlows": [
+        { "id": "cf-1", "direction": "income", "frequency": "recurring", "type": "salary", "label": "Base salary", "amount": 780000, "currency": "CHF", "date": null },
+        { "id": "cf-2", "direction": "income", "frequency": "one_off", "type": "bonus", "label": "Annual bonus", "amount": 450000, "currency": "CHF", "date": "2027-03-31" },
+        { "id": "cf-3", "direction": "expense", "frequency": "recurring", "type": "living_costs", "label": "Household", "amount": 300000, "currency": "CHF", "date": null },
+        { "id": "cf-4", "direction": "expense", "frequency": "recurring", "type": "taxes", "label": "Taxes", "amount": 240000, "currency": "CHF", "date": null },
+        { "id": "cf-5", "direction": "expense", "frequency": "recurring", "type": "education", "label": "School and university fees", "amount": 90000, "currency": "CHF", "date": null },
+        { "id": "cf-6", "direction": "expense", "frequency": "recurring", "type": "alimony", "label": "Alimony", "amount": 120000, "currency": "CHF", "date": null }
+      ],
+      "family": {
+        "maritalStatus": "divorced",
+        "hasChildren": true,
+        "members": [
+          { "id": "fam-1", "relation": "ex_spouse", "name": "Sarah Whitfield", "birthYear": 1971, "residence": {"city": "London", "country": "GB"}, "otherParentId": null, "notes": "Divorced in 2021" },
+          { "id": "fam-2", "relation": "partner", "name": "Claire Dubois", "birthYear": 1979, "residence": {"city": "Zug", "country": "CH"}, "otherParentId": null, "notes": null },
+          { "id": "fam-3", "relation": "child", "name": "Oliver Whitfield", "birthYear": 2008, "residence": {"city": "Boston", "country": "US"}, "otherParentId": "fam-1", "notes": "Started university in the US" },
+          { "id": "fam-4", "relation": "child", "name": "Emily Whitfield", "birthYear": 2011, "residence": {"city": "London", "country": "GB"}, "otherParentId": "fam-1", "notes": "Lives with her mother" }
+        ]
+      },
+      "activityNotes": [
+        {
+          "id": "note-1",
+          "date": "2026-02-10",
+          "author": "Relationship manager",
+          "text": "Annual review. Bonus expected again in March 2027. As part of the divorce settlement he is buying a flat in London for Sarah, around GBP 900,000, completion planned this year.",
+          "facts": [
+            { "id": "c-002-flat", "section": "wealth", "summary": "a flat in London for his former wife, around GBP 900,000, to be bought this year", "expect": {"kind": "cash_flow", "direction": "expense", "flow_type": "major_purchase"} }
+          ]
+        }
+      ]
+    },
+    {
+      "client": {
+        "id": "c-003",
+        "name": "Sofia Marchetti",
+        "dateOfBirth": "1981-06-25",
+        "domicile": {
+          "city": "Lugano",
+          "country": "CH"
+        },
+        "segment": "Independent",
+        "riskScore": "Medium",
+        "performanceYtdPct": 3.8,
+        "lastContact": "2026-09-12"
+      },
+      "assets": [
+        { "id": "ast-1", "bankable": true, "type": "cash", "label": "Accounts", "amount": 220000, "currency": "CHF", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-2", "bankable": true, "type": "funds", "label": "Balanced fund mandate", "amount": 2600000, "currency": "CHF", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-3", "bankable": true, "type": "funds", "label": "Euro bond funds", "amount": 350000, "currency": "EUR", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-4", "bankable": false, "type": "real_estate", "label": "Architecture studio, Lugano", "amount": 1200000, "currency": "CHF", "country": "CH", "bank": null },
+        { "id": "ast-5", "bankable": true, "type": "funds", "label": "Savings funds", "amount": 600000, "currency": "EUR", "country": "IT", "bank": "Intesa Sanpaolo" }
+      ],
+      "liabilities": [
+        { "id": "lia-1", "type": "mortgage", "label": "Mortgage on the studio", "amount": 700000, "currency": "CHF", "country": "CH", "bank": "BancaStato", "securedByAssetId": "ast-4" },
+        { "id": "lia-2", "type": "personal_loan", "label": "Personal loan", "amount": 80000, "currency": "EUR", "country": "IT", "bank": null, "securedByAssetId": null }
+      ],
+      "pensions": [
+        { "id": "pen-1", "type": "pillar_3a", "provider": "Warren & Cie", "amount": 95000, "currency": "CHF", "country": "CH" }
+      ],
+      "cashFlows": [
+        { "id": "cf-1", "direction": "income", "frequency": "recurring", "type": "business_income", "label": "Studio profit", "amount": 310000, "currency": "CHF", "date": null },
+        { "id": "cf-2", "direction": "expense", "frequency": "recurring", "type": "living_costs", "label": "Living costs", "amount": 240000, "currency": "CHF", "date": null },
+        { "id": "cf-3", "direction": "expense", "frequency": "recurring", "type": "taxes", "label": "Taxes", "amount": 85000, "currency": "CHF", "date": null }
+      ],
+      "family": {
+        "maritalStatus": "cohabiting",
+        "hasChildren": false,
+        "members": []
+      },
+      "activityNotes": [
+        {
+          "id": "note-1",
+          "date": "2026-09-12",
+          "author": "Relationship manager",
+          "text": "Meeting at the studio. She plans to sell the upper floor of the studio building next year, for around CHF 400,000.",
+          "facts": [
+            { "id": "c-003-sale", "section": "wealth", "summary": "the planned sale of the upper floor of the studio building, around CHF 400,000, next year", "expect": {"kind": "cash_flow", "direction": "income", "flow_type": "asset_sale"} }
+          ]
+        }
+      ]
+    },
+    {
+      "client": {
+        "id": "c-004",
+        "name": "Henrik Larsson",
+        "dateOfBirth": "1949-01-30",
+        "domicile": {
+          "city": "Montreux",
+          "country": "CH"
+        },
+        "segment": "Privatier",
+        "riskScore": "Low",
+        "performanceYtdPct": 2.2,
+        "lastContact": "2026-06-03"
+      },
+      "assets": [
+        { "id": "ast-1", "bankable": true, "type": "cash", "label": "Accounts", "amount": 1200000, "currency": "CHF", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-2", "bankable": true, "type": "bonds", "label": "Investment-grade bonds", "amount": 5500000, "currency": "CHF", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-3", "bankable": true, "type": "equities", "label": "Dividend equities", "amount": 2100000, "currency": "CHF", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-4", "bankable": true, "type": "bonds", "label": "Swedish government bonds", "amount": 30000000, "currency": "SEK", "country": "SE", "bank": "SEB" },
+        { "id": "ast-5", "bankable": false, "type": "real_estate", "label": "Lakeside apartment, Montreux", "amount": 3200000, "currency": "CHF", "country": "CH", "bank": null },
+        { "id": "ast-6", "bankable": false, "type": "art_collectibles", "label": "Scandinavian art collection", "amount": null, "currency": null, "country": "CH", "bank": null }
+      ],
+      "liabilities": [],
+      "pensions": [],
+      "cashFlows": [
+        { "id": "cf-1", "direction": "income", "frequency": "recurring", "type": "pension", "label": "Swiss and Swedish state pensions", "amount": 95000, "currency": "CHF", "date": null },
+        { "id": "cf-2", "direction": "expense", "frequency": "recurring", "type": "living_costs", "label": "Living costs", "amount": 320000, "currency": "CHF", "date": null },
+        { "id": "cf-3", "direction": "expense", "frequency": "one_off", "type": "gift", "label": "Planned gift to his daughter", "amount": 500000, "currency": "CHF", "date": null }
+      ],
+      "family": {
+        "maritalStatus": "widowed",
+        "hasChildren": true,
+        "members": [
+          { "id": "fam-1", "relation": "child", "name": "Astrid Larsson", "birthYear": 1978, "residence": {"city": "Stockholm", "country": "SE"}, "otherParentId": null, "notes": null },
+          { "id": "fam-2", "relation": "child", "name": "Erik Larsson", "birthYear": 1981, "residence": null, "otherParentId": null, "notes": null }
+        ]
+      },
+      "activityNotes": [
+        {
+          "id": "note-1",
+          "date": "2026-06-03",
+          "author": "Relationship manager",
+          "text": "Visit in Montreux. Besides SEB he keeps roughly SEK 35 million in a custody account with Handelsbanken in Stockholm. Wants to give CHF 500,000 to Astrid, no date yet.",
+          "facts": [
+            { "id": "c-004-ext", "section": "wealth", "summary": "roughly SEK 35 million in a custody account with Handelsbanken", "expect": {"kind": "external_assets", "amount": 35000000, "currency": "SEK", "bank": "Handelsbanken"} },
+            { "id": "c-004-gift", "section": "wealth", "summary": "a planned gift of CHF 500,000 to Astrid", "expect": {"kind": "cash_flow", "direction": "expense", "flow_type": "gift"} }
+          ]
+        }
+      ]
+    },
+    {
+      "client": {
+        "id": "c-005",
+        "name": "Amira Haddad",
+        "dateOfBirth": "1987-09-08",
+        "domicile": {
+          "city": "Genève",
+          "country": "CH"
+        },
+        "segment": "Entrepreneur",
+        "riskScore": "High",
+        "performanceYtdPct": 11.2,
+        "lastContact": "2026-09-25"
+      },
+      "assets": [
+        { "id": "ast-1", "bankable": true, "type": "cash", "label": "Accounts", "amount": 150000, "currency": "CHF", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-2", "bankable": true, "type": "equities", "label": "Growth equity portfolio", "amount": 3200000, "currency": "CHF", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-3", "bankable": false, "type": "business_stake", "label": "Haddad Logistics SA", "amount": null, "currency": null, "country": "CH", "bank": null },
+        { "id": "ast-4", "bankable": false, "type": "crypto", "label": "Crypto holdings (self-custody)", "amount": 400000, "currency": "USD", "country": null, "bank": null }
+      ],
+      "liabilities": [
+        { "id": "lia-1", "type": "mortgage", "label": "Mortgage", "amount": 900000, "currency": "CHF", "country": "CH", "bank": "Raiffeisen", "securedByAssetId": null }
+      ],
+      "pensions": [],
+      "cashFlows": [],
+      "family": {
+        "maritalStatus": null,
+        "hasChildren": null,
+        "members": []
+      },
+      "activityNotes": [
+        {
+          "id": "note-1",
+          "date": "2026-09-25",
+          "author": "Relationship manager",
+          "text": "Coffee after the investor day. She married Karim Mansour in June; he works for a trading house in Geneva. They bought an apartment in Champel together, which is what the mortgage is for.",
+          "facts": [
+            { "id": "c-005-spouse", "section": "family", "summary": "she married Karim Mansour in June", "expect": {"kind": "family_member", "relation": "spouse", "name": "Karim"} },
+            { "id": "c-005-home", "section": "wealth", "summary": "an apartment in Champel bought with her husband, financed by the mortgage", "expect": {"kind": "asset", "asset_type": "real_estate"} }
+          ]
+        }
+      ]
+    },
+    {
+      "client": {
+        "id": "c-006",
+        "name": "Thomas Keller",
+        "dateOfBirth": "1968-04-17",
+        "domicile": {
+          "city": "Basel",
+          "country": "CH"
+        },
+        "segment": "Independent",
+        "riskScore": "Low",
+        "performanceYtdPct": 4.5,
+        "lastContact": "2026-07-14"
+      },
+      "assets": [
+        { "id": "ast-1", "bankable": true, "type": "cash", "label": "Accounts", "amount": 400000, "currency": "CHF", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-2", "bankable": true, "type": "funds", "label": "Income fund mandate", "amount": 2900000, "currency": "CHF", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-3", "bankable": true, "type": "funds", "label": "Fund savings plan", "amount": 750000, "currency": "CHF", "country": "CH", "bank": "Basler Kantonalbank" },
+        { "id": "ast-4", "bankable": false, "type": "real_estate", "label": "Family home, Basel", "amount": 2100000, "currency": "CHF", "country": "CH", "bank": null },
+        { "id": "ast-5", "bankable": false, "type": "real_estate", "label": "Holiday house, Alsace", "amount": 900000, "currency": "EUR", "country": "FR", "bank": null }
+      ],
+      "liabilities": [
+        { "id": "lia-1", "type": "mortgage", "label": "Mortgage, Basel", "amount": 1100000, "currency": "CHF", "country": "CH", "bank": "Basler Kantonalbank", "securedByAssetId": "ast-4" }
+      ],
+      "pensions": [],
+      "cashFlows": [
+        { "id": "cf-1", "direction": "income", "frequency": "recurring", "type": "business_income", "label": "Medical practice", "amount": 480000, "currency": "CHF", "date": null },
+        { "id": "cf-2", "direction": "income", "frequency": "one_off", "type": "inheritance", "label": "Expected inheritance from his mother", "amount": 1500000, "currency": "CHF", "date": null },
+        { "id": "cf-3", "direction": "expense", "frequency": "recurring", "type": "living_costs", "label": "Living costs", "amount": 190000, "currency": "CHF", "date": null }
+      ],
+      "family": {
+        "maritalStatus": "married",
+        "hasChildren": true,
+        "members": [
+          { "id": "fam-1", "relation": "spouse", "name": "Anna Keller", "birthYear": null, "residence": {"city": "Basel", "country": "CH"}, "otherParentId": null, "notes": null },
+          { "id": "fam-2", "relation": "child", "name": "Lukas Keller", "birthYear": 1997, "residence": {"city": "Basel", "country": "CH"}, "otherParentId": "fam-1", "notes": "Physician, may take over the practice" },
+          { "id": "fam-3", "relation": "child", "name": "Marie Keller", "birthYear": 2000, "residence": null, "otherParentId": "fam-1", "notes": null }
+        ]
+      },
+      "activityNotes": [
+        {
+          "id": "note-1",
+          "date": "2026-07-14",
+          "author": "Relationship manager",
+          "text": "His mother passed away in May; the inheritance of about CHF 1.5 million should be paid out by the end of the year. Marie now lives in Lyon.",
+          "facts": [
+            { "id": "c-006-marie", "section": "family", "summary": "Marie now lives in Lyon, France", "expect": {"kind": "member_residence", "name": "Marie", "country": "FR"} }
+          ]
+        }
+      ]
+    },
+    {
+      "client": {
+        "id": "c-007",
+        "name": "Isabelle Fontaine",
+        "dateOfBirth": "1975-12-03",
+        "domicile": {
+          "city": "Lausanne",
+          "country": "CH"
+        },
+        "segment": "Top Executive",
+        "riskScore": "Medium",
+        "performanceYtdPct": 5.1,
+        "lastContact": "2025-11-18"
+      },
+      "assets": [
+        { "id": "ast-1", "bankable": true, "type": "cash", "label": "Accounts", "amount": 500000, "currency": "CHF", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-2", "bankable": true, "type": "equities", "label": "Global equity mandate", "amount": 2800000, "currency": "CHF", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-3", "bankable": null, "type": "equities", "label": "Employer stock options", "amount": 900000, "currency": null, "country": null, "bank": null },
+        { "id": "ast-4", "bankable": true, "type": "cash", "label": "Salary account", "amount": 1200000, "currency": "CHF", "country": "CH", "bank": "UBS" }
+      ],
+      "liabilities": [],
+      "pensions": [
+        { "id": "pen-1", "type": "pillar_2", "provider": "Employer pension fund", "amount": null, "currency": "CHF", "country": "CH" }
+      ],
+      "cashFlows": [
+        { "id": "cf-1", "direction": "income", "frequency": "recurring", "type": "salary", "label": "Salary", "amount": 520000, "currency": "CHF", "date": null }
+      ],
+      "family": {
+        "maritalStatus": "married",
+        "hasChildren": true,
+        "members": []
+      },
+      "activityNotes": [
+        {
+          "id": "note-1",
+          "date": "2025-11-18",
+          "author": "Relationship manager",
+          "text": "Year-end call. Her husband Pierre is a surgeon at the university hospital. Two children, Chloe (14) and Hugo (11), both at school in Lausanne.",
+          "facts": [
+            { "id": "c-007-spouse", "section": "family", "summary": "her husband is Pierre", "expect": {"kind": "family_member", "relation": "spouse", "name": "Pierre"} },
+            { "id": "c-007-chloe", "section": "family", "summary": "a daughter, Chloe, aged 14, in Lausanne", "expect": {"kind": "family_member", "relation": "child", "name": "Chlo"} },
+            { "id": "c-007-hugo", "section": "family", "summary": "a son, Hugo, aged 11, in Lausanne", "expect": {"kind": "family_member", "relation": "child", "name": "Hugo"} }
+          ]
+        }
+      ]
+    },
+    {
+      "client": {
+        "id": "c-008",
+        "name": "Rafael Ortega",
+        "dateOfBirth": "1960-08-19",
+        "domicile": {
+          "city": "Verbier",
+          "country": "CH"
+        },
+        "segment": "Privatier",
+        "riskScore": "Medium",
+        "performanceYtdPct": -0.8,
+        "lastContact": "2026-09-02"
+      },
+      "assets": [
+        { "id": "ast-1", "bankable": true, "type": "cash", "label": "Euro accounts", "amount": 600000, "currency": "EUR", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-2", "bankable": true, "type": "funds", "label": "Multi-asset mandate", "amount": 2400000, "currency": "CHF", "country": "CH", "bank": "Warren & Cie" },
+        { "id": "ast-3", "bankable": true, "type": "bonds", "label": "US dollar bonds", "amount": 1100000, "currency": "USD", "country": "CH", "bank": "Warren & Cie", "situs": "US", "holding": "direct" },
+        { "id": "ast-4", "bankable": true, "type": "cash", "label": "Deposits", "amount": 1500000, "currency": "EUR", "country": "ES", "bank": "Santander" },
+        { "id": "ast-5", "bankable": true, "type": "equities", "label": "Spanish equities", "amount": 1600000, "currency": "EUR", "country": "ES", "bank": "BBVA" },
+        { "id": "ast-6", "bankable": false, "type": "real_estate", "label": "Chalet, Verbier", "amount": 5200000, "currency": "CHF", "country": "CH", "bank": null },
+        { "id": "ast-7", "bankable": false, "type": "real_estate", "label": "Villa, Marbella", "amount": 2300000, "currency": "EUR", "country": "ES", "bank": null },
+        { "id": "ast-8", "bankable": false, "type": "real_estate", "label": "Apartment, Miami", "amount": 1800000, "currency": "USD", "country": "US", "bank": null }
+      ],
+      "liabilities": [
+        { "id": "lia-1", "type": "mortgage", "label": "Mortgage, Verbier", "amount": 2000000, "currency": "CHF", "country": "CH", "bank": "Banque Cantonale du Valais", "securedByAssetId": "ast-6" },
+        { "id": "lia-2", "type": "mortgage", "label": "Mortgage, Marbella", "amount": 700000, "currency": "EUR", "country": "ES", "bank": "Santander", "securedByAssetId": "ast-7" }
+      ],
+      "pensions": [
+        { "id": "pen-1", "type": "foreign_pension", "provider": "Spanish pension plan", "amount": 300000, "currency": "EUR", "country": "ES" }
+      ],
+      "cashFlows": [
+        { "id": "cf-1", "direction": "income", "frequency": "recurring", "type": "rental", "label": "Rental income, Marbella and Miami", "amount": 110000, "currency": "EUR", "date": null },
+        { "id": "cf-2", "direction": "income", "frequency": "recurring", "type": "pension", "label": "Pension", "amount": 60000, "currency": "CHF", "date": null },
+        { "id": "cf-3", "direction": "income", "frequency": "one_off", "type": "asset_sale", "label": "Sale of the Madrid apartment", "amount": 1200000, "currency": "EUR", "date": "2027-01-15" },
+        { "id": "cf-4", "direction": "expense", "frequency": "recurring", "type": "living_costs", "label": "Living costs", "amount": 260000, "currency": "CHF", "date": null },
+        { "id": "cf-5", "direction": "expense", "frequency": "recurring", "type": "taxes", "label": "Taxes", "amount": 120000, "currency": "CHF", "date": null }
+      ],
+      "family": {
+        "maritalStatus": "married",
+        "hasChildren": true,
+        "members": [
+          { "id": "fam-1", "relation": "spouse", "name": "Carmen Ortega", "birthYear": 1963, "residence": {"city": "Verbier", "country": "CH"}, "otherParentId": null, "notes": null },
+          { "id": "fam-2", "relation": "child", "name": "Diego Ortega", "birthYear": 1971, "residence": {"city": "Madrid", "country": "ES"}, "otherParentId": "fam-1", "notes": "Runs the family's Spanish properties" },
+          { "id": "fam-3", "relation": "child", "name": "Lucía Ortega", "birthYear": 1992, "residence": {"city": "Miami", "country": "US"}, "otherParentId": "fam-1", "notes": null }
+        ],
+        "hasWill": true
+      },
+      "activityNotes": [
+        {
+          "id": "note-1",
+          "date": "2026-09-02",
+          "author": "Relationship manager",
+          "text": "Lunch in Verbier. He keeps a boat moored in Palma, worth around EUR 800,000 and registered in his own name. Carmen and he signed a will in Spain in 2019.",
+          "facts": [
+            { "id": "c-008-boat", "section": "wealth", "summary": "a boat moored in Palma, worth around EUR 800,000, in his own name", "expect": {"kind": "asset", "label_contains": "boat"} },
+            { "id": "c-008-will", "section": "family", "summary": "a will signed in Spain in 2019", "expect": {"kind": "will"} }
+          ]
+        }
+      ]
+    }
+  ]
+}

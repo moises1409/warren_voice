@@ -1,163 +1,188 @@
-<a href="https://livekit.io/">
-  <img src="./.github/assets/livekit-mark.png" alt="LiveKit logo" width="100" height="100">
-</a>
+# Warren — client meeting preparation
 
-# LiveKit Agents Starter - Python
+Warren is a voice assistant that helps a private banker prepare a client meeting. The banker
+picks a client, talks to Warren, and together they review the client's wealth and family
+situation. The result is a list of **meeting points**: what to raise or ask in the meeting,
+worded so it is easy to bring up in conversation.
 
-A complete starter project for building voice AI apps with [LiveKit Agents for Python](https://github.com/livekit/agents) and [LiveKit Cloud](https://cloud.livekit.io/).
+The banker speaks; the screen shows. Everything Warren records appears live on screen.
 
-The starter project includes:
+- `src/` — the agent, built with [LiveKit Agents for Python](https://github.com/livekit/agents)
+  on the Gemini Live API.
+- `frontend/` — the web app (Next.js), built on the LiveKit agent starter.
+- `data/` — mock clients and settings, read by both.
+- `knowledge/` — the guidance Warren follows, as Markdown the bank can edit.
+- `rules/` — the tax rules behind the cost-of-inaction simulation (illustrative).
+- `docs/meeting-prep-design.md` — spec, design and plan.
 
-- A simple voice AI assistant, ready for extension and customization
-- A voice AI pipeline built on [LiveKit Inference](https://docs.livekit.io/agents/models/inference), providing zero-configuration access to [models](https://docs.livekit.io/agents/models) from top labs
-  - Uses the fast, open-weight Gemma 4 31B model, [hosted by LiveKit](https://docs.livekit.io/agents/models/llm/livekit/) and tuned for optimal performance in voice AI, as the default LLM
-  - Uses Fish Audio S2.1 Pro for TTS, which renders the inline delivery markup that expressive mode relies on
-  - Supports more than 50 models from OpenAI, Cartesia, Deepgram, and other providers
-  - Access to a wide range of other models, including [Realtime models](https://docs.livekit.io/agents/models/realtime), through extensive plugin ecosystem
-- Expressive mode, enabled by default: the framework injects the TTS provider's markup guide into the LLM prompt, so the model emits inline delivery tags (emotion, pacing, non-verbal sounds) that the TTS renders and the transcript never shows
-- Eval suite based on the LiveKit Agents [testing & evaluation framework](https://docs.livekit.io/agents/start/testing/)
-- [LiveKit Turn Detector](https://docs.livekit.io/agents/logic/turns/turn-detector/), an end-of-turn model that listens to the user's audio directly, combining semantic understanding with acoustic cues for state-of-the-art accuracy across 14 languages
-- [Background voice cancellation](https://docs.livekit.io/transport/media/noise-cancellation/)
-- Deep session insights from LiveKit [Agent Observability](https://docs.livekit.io/deploy/observability/)
-- A Dockerfile ready for [production deployment to LiveKit Cloud](https://docs.livekit.io/deploy/agents/)
+## How a session works
 
-This starter app is compatible with any [custom web/mobile frontend](https://docs.livekit.io/frontends/) or [telephony](https://docs.livekit.io/telephony/).
+Opening a client shows the wealth and the family as the bank knows them, without a
+conversation and without any list of points: those come up while talking to Warren. The
+banker picks the language Warren speaks (English, French or Spanish; the screen stays in
+English) and starts Warren in one of two ways:
 
-## Using coding agents
+- **Walk me through it** — a guided review. Warren leads, one point at a time; a card on
+  screen shows the current point, the part of the screen it is about stays open and the rest
+  folds. The steps are grouped (wealth, family, general, simulation) in Warren's panel.
+  Each point ends one of three ways, by voice or with a button: the banker gives the
+  answer, keeps it for the meeting, or says it is not relevant. Before moving from the
+  wealth to the family, and before the report, Warren says the part is finished and asks;
+  the screen changes once the banker agrees. The report comes only when every point has
+  been gone through or kept for the meeting. A point the banker dictates ("note that the
+  children should be invited") is recorded at once and not asked about again. After the wealth and family
+  points Warren offers to simulate the client's death; accepted, the balance sheet turns into
+  the simulation on screen, then the family view shows who would receive what.
+- **I'll look myself — just listen** — the banker reads and Warren acts only when asked.
 
-This project is designed to work with coding agents like [Claude Code](https://claude.com/product/claude-code), [Cursor](https://www.cursor.com/), and [Codex](https://openai.com/codex/).
+The banker can switch between the two at any time ("let me look", "carry on"). The session
+is saved as it goes: an interrupted review resumes at the same point, in the same
+conversation or after leaving the page. **Start over** discards it. See
+`docs/guided-review-spec.md`.
 
-For your convenience, LiveKit offers both a CLI and an [MCP server](https://docs.livekit.io/reference/developer-tools/docs-mcp/) that can be used to browse and search its documentation. The [LiveKit CLI](https://docs.livekit.io/intro/basics/cli/) (`lk docs`) works with any coding agent that can run shell commands. Install it for your platform:
+The page has three stages:
 
-**macOS:**
+1. **Client list** (`/`). One row per client; **Prepare meeting** opens the client's page.
+   The banker starts the conversation with Warren from there, when ready.
+2. **Wealth.** Two sections, each with a **Visual | Table** switch: the balance sheet and
+   income and expenses. Visual shows two 3D towers of equal height (assets | debt and net
+   worth; income | expenses and surplus, or the shortfall funded from capital) with every item
+   listed beside them. Table shows the T-account with full details, and its tab counts the
+   items that are incomplete. Pension plans sit below, off balance sheet.
+3. **Family.** A family tree: the client, partner and former partners, children. Cards are
+   marked when someone lives abroad, is a minor, or has details missing; a new family member
+   grows into the tree when Warren records it.
+4. **Report.** A summary, key figures, and each meeting point with a conversation opener.
+
+When Warren records something, the row flashes, the block resizes and the totals count to
+their new value. When Warren mentions something that is on screen, it lights up: the frontend
+matches the words of Warren's live transcript against the items shown
+(`frontend/hooks/useSpokenFocus.ts`), so this costs the agent nothing.
+
+An item and the meeting points about it light up together: hover a person, a row or a block
+to see its points, hover a point to see what it is about, click a point to go to its section.
+
+**Cost of inaction.** A switch above the workspace, **Today | If the client died today**,
+shows what the client's death would cost and who would receive what: in Wealth, the taxes
+each asset would trigger and what would reach the heirs; in Family, each heir's share, tax
+and net, and how much of the assets held at the bank would pass to heirs abroad. Warren
+turns it on when asked ("what if she died tomorrow?"). Each cost becomes a meeting point
+that names the bank expert to involve, and the report lists the experts to invite. The
+figures come from `rules/succession.yaml` through `src/succession.py`, never from the
+model. **The rules shipped here are illustrative and have not been reviewed by a tax
+professional**; the screen says so. See `docs/cost-of-inaction-spec.md`.
+
+The banker can move between stages by voice or with the stepper, type instead of speaking,
+turn on the camera, or share the screen.
+
+## Run it
+
+You need a [LiveKit Cloud](https://cloud.livekit.io/) project and a Google Gemini API key.
+
+**Agent.** Copy `.env.example` to `.env.local` and set `LIVEKIT_URL`, `LIVEKIT_API_KEY`,
+`LIVEKIT_API_SECRET` and `GOOGLE_API_KEY`. Then:
 
 ```console
-brew install livekit-cli
-```
-
-**Linux:**
-
-```console
-curl -sSL https://get.livekit.io/cli | bash
-```
-
-**Windows:**
-
-```console
-winget install LiveKit.LiveKitCLI
-```
-
-The `lk docs` subcommand requires version 2.15.0 or higher. Check your version with `lk --version` and update if needed. Once installed, your coding agent can search and browse LiveKit documentation directly from the terminal:
-
-```console
-lk docs search "voice agents"
-lk docs get-page /agents/start/voice-ai-quickstart
-```
-
-See the [Using coding agents](https://docs.livekit.io/intro/coding-agents/) guide for more details, including MCP server setup.
-
-The project includes a complete [AGENTS.md](AGENTS.md) file for these assistants. You can modify this file to suit your needs. To learn more about this file, see [https://agents.md](https://agents.md).
-
-## Dev Setup
-
-Create a project from this template with the LiveKit CLI (recommended):
-
-```bash
-lk cloud auth
-lk agent init my-agent --template agent-starter-python
-```
-
-The CLI clones the template and configures your environment. Then follow the rest of this guide from [Run the agent](#run-the-agent).
-
-<details>
-<summary>Alternative: Manual setup without the CLI</summary>
-
-Clone the repository and install dependencies to a virtual environment:
-
-```console
-cd agent-starter-python
 uv sync
-```
-
-Sign up for [LiveKit Cloud](https://cloud.livekit.io/) then set up the environment by copying `.env.example` to `.env.local` and filling in the required keys:
-
-- `LIVEKIT_URL`
-- `LIVEKIT_API_KEY`
-- `LIVEKIT_API_SECRET`
-
-You can load the LiveKit environment automatically using the [LiveKit CLI](https://docs.livekit.io/intro/basics/cli/):
-
-```bash
-lk cloud auth
-lk app env --write --destination .env.local
-```
-
-</details>
-
-## Run the agent
-
-Run this command to speak to your agent directly in your terminal:
-
-```console
-uv run python src/agent.py console
-```
-
-To run the agent for use with a frontend or telephony, use the `dev` command:
-
-```console
 uv run python src/agent.py dev
 ```
 
-In production, use the `start` command:
+**Frontend.** In `frontend/`, copy `.env.example` to `.env.local`, set the same three LiveKit
+values and `AGENT_NAME` to the agent's name. Then:
 
 ```console
-uv run python src/agent.py start
+pnpm install
+pnpm dev
 ```
 
-## Frontend & Telephony
+Open http://localhost:3000.
 
-Get started quickly with our pre-built frontend starter apps, or add telephony support:
-
-| Platform | Link | Description |
-|----------|----------|-------------|
-| **Web** | [`livekit-examples/agent-starter-react`](https://github.com/livekit-examples/agent-starter-react) | Web voice AI assistant with React & Next.js |
-| **iOS/macOS** | [`livekit-examples/agent-starter-swift`](https://github.com/livekit-examples/agent-starter-swift) | Native iOS, macOS, and visionOS voice AI assistant |
-| **Flutter** | [`livekit-examples/agent-starter-flutter`](https://github.com/livekit-examples/agent-starter-flutter) | Cross-platform voice AI assistant app |
-| **React Native** | [`livekit-examples/voice-assistant-react-native`](https://github.com/livekit-examples/voice-assistant-react-native) | Native mobile app with React Native & Expo |
-| **Android** | [`livekit-examples/agent-starter-android`](https://github.com/livekit-examples/agent-starter-android) | Native Android app with Kotlin & Jetpack Compose |
-| **Web Embed** | [`livekit-examples/agent-starter-embed`](https://github.com/livekit-examples/agent-starter-embed) | Voice AI widget for any website |
-| **Telephony** | [Documentation](https://docs.livekit.io/telephony/) | Add inbound or outbound calling to your agent |
-
-For advanced customization, see the [complete frontend guide](https://docs.livekit.io/frontends/).
-
-## Tests and evals
-
-Simulations run full multi-turn conversations between a simulated user and your agent on LiveKit Cloud, then judge each transcript. The scenarios live in [`scenarios.yaml`](scenarios.yaml). Run them locally with the [LiveKit CLI](https://docs.livekit.io/intro/basics/cli/):
+**Seed the sessions** once, and again after changing `data/clients.json`, the rules or the
+checks, so that the simulation is available, and a review can be resumed, before any conversation:
 
 ```console
-lk agent simulate --scenarios scenarios.yaml
+uv run python src/seed.py           # keeps sessions in progress
+uv run python src/seed.py --force   # resets every client
 ```
 
-The `Simulations` workflow in `.github/workflows/simulations.yml` runs the same file on every merge to `main` and on demand from the Actions tab. It runs there rather than on every pull request push because each run spends real inference. See the [simulations guide](https://docs.livekit.io/agents/start/testing/simulations/) for how to write scenarios and read results.
+Sessions are saved as files under `data/sessions/` (git-ignored). This needs the agent and
+the frontend to share a disk, as they do locally; deployed as two services they do not, and
+the store in `src/sessions.py` has to be replaced by a database.
 
-For turn-level checks that don't need a live session, the LiveKit Agents [testing & evaluation framework](https://docs.livekit.io/agents/start/testing/) runs your agent in-process under `pytest`. A commented-out example lives in [`tests/test_agent.py`](tests/test_agent.py).
+**Agent name.** The agent registers under `AGENT_NAME` (default `warren-prep`) and the
+frontend dispatches sessions to its own `AGENT_NAME`; the two must match. Workers that share
+a name share the sessions, so give each environment its own: for example `warren-prep` for
+the deployed pair and `warren-dev` in both local `.env.local` files.
 
-## Using this template repo for your own project
+`uv run python src/agent.py console` talks to the agent in the terminal, without the
+frontend. It prepares the client named in `WARREN_DEFAULT_CLIENT` (default `c-001`).
 
-Once you've started your own project based on this repo, you should:
+## How it is built
 
-1. **Check in your `uv.lock`**: This file is currently untracked for the template, but you should commit it to your repository for reproducible builds and proper configuration management. (The same applies to `livekit.toml`, if you run your agents in LiveKit Cloud)
+**The agent owns the state.** A session's state (`PrepState` in `src/models.py`) lives in a
+`PrepStore`. Tools are the only way to change it. After every change the agent sends the whole
+state to the frontend on the `warren.state` text stream; the frontend renders the newest
+revision and highlights what changed. The frontend calls two RPC methods on the agent:
+`warren.request_state` and `warren.set_stage`. The client to prepare travels as dispatch
+metadata (`{"clientId": "c-001", "mode": "guided", "language": "fr"}`).
 
-2. **Add your own repository secrets**: You must [add secrets](https://docs.github.com/en/actions/how-tos/writing-workflows/choosing-what-your-workflow-does/using-secrets-in-github-actions) for `LIVEKIT_URL`, `LIVEKIT_API_KEY`, and `LIVEKIT_API_SECRET` so that the simulations can run in CI.
+**One agent per stage** (`src/stages.py`): `WealthAgent`, `FamilyAgent`, `ReportAgent`, with
+handoffs between them. Each carries only its own instructions, guidance file and tools.
 
-## Deploying to production
+**Two layers of rules.**
 
-This project is production-ready and includes a working `Dockerfile`. To deploy it to LiveKit Cloud or another environment, see the [deploying to production](https://docs.livekit.io/deploy/agents/) guide.
+- `knowledge/wealth.md`, `family.md`, `report.md` are loaded into the agent's instructions:
+  what to capture, which situations deserve a question, what never to say. Edit them freely.
+- `src/checks.py` runs after every change and computes findings that must not depend on the
+  model: missing fields, arithmetic mismatches, implausible dates. Each finding becomes a
+  meeting point, closes when the data fixes it, and reopens if the problem returns.
 
-## Self-hosted LiveKit
+**Activity notes.** The screen shows the structured fields of the CRM. Each client also has
+free-text activity notes (`activityNotes` in `data/clients.json`). When a note says something
+the fields do not carry, a meeting point names the note, and Warren asks whether to record
+it. In this demo the facts a note contains are tagged by hand in the mock data; nothing
+reads the free text.
 
-You can also self-host LiveKit instead of using LiveKit Cloud. See the [self-hosting](https://docs.livekit.io/transport/self-hosting/local/) guide for more information. If you choose to self-host, you'll need to also use [model plugins](https://docs.livekit.io/agents/models/#plugins) instead of LiveKit Inference and will need to remove the [LiveKit Cloud noise cancellation](https://docs.livekit.io/transport/media/noise-cancellation/) plugin.
+**The report** (`src/report.py`) computes all figures in code. A text model (Gemini Flash,
+`WARREN_REPORT_MODEL` to change it) writes the summary and the conversation openers; the
+summary is shown as it is written and the report builds on screen in about three seconds. If it
+fails, the report still shows the figures and the raw points.
+
+**Mock data.** `data/clients.json` holds eight clients with deliberately uneven data.
+`data/settings.json` holds the house bank, base currency and FX rates. Session changes are saved
+under `data/sessions/`; **Start over** goes back to the file.
+
+## Tests
+
+```console
+uv run pytest
+```
+
+- `tests/test_agenda.py` — the guided review: order of the steps, moving through them,
+  saving and resuming. Fast, no network.
+- `tests/test_agent_guided.py` — the agents in guided and listening mode; calls the voice model.
+- `tests/test_succession.py` — the succession engine on the mock clients and on small
+  rule sets. Fast, no network.
+- `tests/test_agent_succession.py` — the agents and the simulation; calls the voice model.
+- `tests/test_store.py`, `tests/test_checks.py` — the store and every check, including what
+  each mock client must trigger. Fast, no network.
+- `tests/test_report.py` — report assembly; one test calls the text model.
+- `tests/test_agent.py` — the stage agents, run in-process against the production voice
+  model. About four minutes; needs `GOOGLE_API_KEY`.
+
+`scenarios.yaml` holds full-conversation simulations: `lk agent simulate --scenarios scenarios.yaml`.
+
+Formatting and linting: `uv run ruff format` and `uv run ruff check`; in `frontend/`,
+`pnpm format` and `pnpm lint`.
+
+## Limits of this version
+
+- Mock data only: no CRM or core-banking integration, no authentication. The token endpoint
+  in `frontend/app/api/token` is for development only.
+- Figures change through the agent, not by typing into the screen.
+- Warren frames topics and questions. It does not recommend products or give tax or legal
+  conclusions.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT — see [LICENSE](LICENSE).

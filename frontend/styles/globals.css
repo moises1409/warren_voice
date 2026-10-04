@@ -12,8 +12,20 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: #002cf2;
-  --primary-hover: color-mix(in srgb, #002cf2 80%, #000);
+  --primary: #1b3a6b;
+  --primary-hover: color-mix(in srgb, #1b3a6b 80%, #000);
+  --info: #1f5fbf;
+  --success: #1a7f4b;
+  --warning: #a15c00;
+  --danger: #c0392b;
+  --tree-line: color-mix(in srgb, var(--foreground) 30%, transparent);
+  /* Balance sheet parts. Validated as a set for colour-vision deficiency in both themes. */
+  --wealth-bank: #2a78d6;
+  --wealth-other: #eb6834;
+  --wealth-illiquid: #1baf7a;
+  --wealth-debt: #eda100;
+  --wealth-net: #4a3aa7;
+  --wealth-tax: #e34948;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -47,8 +59,18 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.269 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: #1fd5f9;
-  --primary-hover: color-mix(in srgb, #1fd5f9 80%, #000);
+  --primary: #8fb4f2;
+  --primary-hover: color-mix(in srgb, #8fb4f2 80%, #000);
+  --info: #7fb0f5;
+  --success: #5fce94;
+  --warning: #e8a94a;
+  --danger: #f08a7e;
+  --wealth-bank: #3987e5;
+  --wealth-other: #d95926;
+  --wealth-illiquid: #199e70;
+  --wealth-debt: #c98500;
+  --wealth-net: #9085e9;
+  --wealth-tax: #e66767;
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
@@ -98,6 +120,10 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-info: var(--info);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -122,5 +148,344 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* A view that just came on screen: the change of stage is seen, not only read. */
+@keyframes view-enter {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.view-enter {
+  animation: view-enter 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* The stage in the header the review has just arrived at. */
+@keyframes stage-arrive {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 60%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 14px transparent;
+  }
+}
+
+.stage-arrive {
+  animation: stage-arrive 0.9s ease-out 2;
+}
+
+/* Text still being written. */
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.writing::after {
+  content: '';
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--primary);
+  animation: caret-blink 0.9s steps(1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .view-enter,
+  .stage-arrive {
+    animation: none;
+  }
+}
+
+/* A row that was just added or changed by the agent. */
+@keyframes row-flash {
+  from {
+    background-color: color-mix(in srgb, var(--primary) 22%, transparent);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+.row-flash {
+  animation: row-flash 2.4s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row-flash {
+    animation-duration: 0.01s;
+  }
+}
+
+/* Family tree: the children hang from a horizontal bar under the parents. */
+.tree-children {
+  display: flex;
+  justify-content: center;
+  padding-top: 1.25rem;
+  position: relative;
+}
+
+.tree-children > li {
+  position: relative;
+  padding: 1.25rem 0.5rem 0;
+}
+
+/* Horizontal bar: each child draws its half to the left and to the right. */
+.tree-children > li::before,
+.tree-children > li::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 1.25rem;
+  border-top: 1px solid var(--tree-line);
+}
+
+.tree-children > li::before {
+  left: 0;
+}
+
+.tree-children > li::after {
+  right: 0;
+  border-left: 1px solid var(--tree-line);
+}
+
+.tree-children > li:first-child::before,
+.tree-children > li:last-child::after {
+  border-top: 0;
+}
+
+/* Stem from the parents down to the bar. */
+.tree-children::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 1.25rem;
+  border-left: 1px solid var(--tree-line);
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* An item Warren is talking about right now. */
+@keyframes row-focus {
+  0%,
+  100% {
+    background-color: color-mix(in srgb, var(--primary) 9%, transparent);
+  }
+  50% {
+    background-color: color-mix(in srgb, var(--primary) 20%, transparent);
+  }
+}
+
+.row-focus {
+  animation: row-focus 1.4s ease-in-out infinite;
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+
+/* 3D balance sheet: two towers of blocks built from CSS faces. */
+.b3d-stage {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 420px;
+  max-width: 100%;
+  height: 320px;
+  padding-bottom: 74px;
+  perspective: 1100px;
+  touch-action: pan-y;
+}
+
+.b3d-scene {
+  --rx: -13deg;
+  --ry: -26deg;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 64px;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform 0.4s ease-out;
+}
+
+.b3d-floor {
+  position: absolute;
+  right: -70px;
+  bottom: 0;
+  left: -70px;
+  height: 230px;
+  transform: translateY(50%) rotateX(90deg);
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--foreground) 16%, transparent),
+    transparent 68%
+  );
+  pointer-events: none;
+}
+
+.b3d-tower {
+  position: relative;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+  width: 120px;
+  transform-style: preserve-3d;
+}
+
+.b3d-caption {
+  position: absolute;
+  top: 100%;
+  right: -24px;
+  left: -24px;
+  margin-top: 16px;
+  transform: translateZ(45px);
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.b3d-block {
+  position: relative;
+  flex-shrink: 0;
+  width: 100%;
+  transform-style: preserve-3d;
+  transition:
+    height 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 0.25s ease-out;
+}
+
+.b3d-face {
+  position: absolute;
+  background: var(--c);
+  transition:
+    filter 0.25s ease-out,
+    opacity 0.25s ease-out;
+}
+
+.b3d-front {
+  inset: 0;
+  transform: translateZ(45px);
+  background: linear-gradient(100deg, rgb(255 255 255 / 0.16), transparent 55%), var(--c);
+}
+
+.b3d-right,
+.b3d-left {
+  top: 0;
+  left: calc(50% - 45px);
+  width: 90px;
+  height: 100%;
+}
+
+.b3d-right {
+  transform: rotateY(90deg) translateZ(60px);
+  filter: brightness(0.7);
+}
+
+.b3d-left {
+  transform: rotateY(-90deg) translateZ(60px);
+  filter: brightness(0.84);
+}
+
+.b3d-top {
+  top: -45px;
+  left: 0;
+  width: 100%;
+  height: 90px;
+  transform: rotateX(90deg);
+  filter: brightness(1.2);
+}
+
+/* Opacity on the block itself would flatten its 3D faces, so the faces are dimmed instead. */
+.b3d-block.is-dim .b3d-face {
+  opacity: 0.28;
+}
+
+.b3d-block.is-lit {
+  transform: translateZ(16px);
+}
+
+.b3d-block.is-lit .b3d-front {
+  filter: brightness(1.12);
+}
+
+@keyframes b3d-focus {
+  0%,
+  100% {
+    transform: translateZ(10px);
+  }
+  50% {
+    transform: translateZ(26px);
+  }
+}
+
+.b3d-block.is-focus {
+  animation: b3d-focus 1.4s ease-in-out infinite;
+}
+
+@keyframes b3d-changed {
+  0% {
+    transform: translateZ(0) scale3d(1, 1, 1);
+  }
+  25% {
+    transform: translateZ(34px) scale3d(1.06, 1, 1.06);
+  }
+  100% {
+    transform: translateZ(0) scale3d(1, 1, 1);
+  }
+}
+
+.b3d-block.is-changed {
+  animation: b3d-changed 1.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.b3d-tooltip {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 100%;
+  padding: 0.3rem 0.7rem;
+  transform: translateX(-50%);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--popover);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+
+.b3d-tooltip[data-visible='true'] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .b3d-scene,
+  .b3d-block {
+    transition: none;
+  }
+
+  .b3d-block.is-focus,
+  .b3d-block.is-changed,
+  .row-focus {
+    animation: none;
   }
 }

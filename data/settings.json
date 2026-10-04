@@ -1,0 +1,12 @@
+{
+  "houseBank": "Warren & Cie",
+  "baseCurrency": "CHF",
+  "fxToBase": {
+    "CHF": 1.0,
+    "EUR": 0.94,
+    "USD": 0.8,
+    "GBP": 1.08,
+    "SEK": 0.085,
+    "JPY": 0.0053
+  }
+}
