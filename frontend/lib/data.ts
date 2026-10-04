@@ -1,9 +1,16 @@
-import { promises as fs } from 'node:fs';
+import { existsSync, promises as fs } from 'node:fs';
 import path from 'node:path';
 import type { Dossier, PrepState, Settings } from '@/lib/types';
 
 // The mock data lives at the repository root so the agent and the frontend read the same files.
-const DATA_DIR = process.env.WARREN_DATA_DIR ?? path.join(process.cwd(), '..', 'data');
+// Deployed on its own, the frontend has no repository root: it reads the copy kept in
+// frontend/data by scripts/sync-data.mjs. No saved sessions there, only the clients.
+const SHARED_DIR = path.join(process.cwd(), '..', 'data');
+const DATA_DIR =
+  process.env.WARREN_DATA_DIR ??
+  (existsSync(path.join(SHARED_DIR, 'clients.json'))
+    ? SHARED_DIR
+    : path.join(process.cwd(), 'data'));
 
 async function readJson<T>(name: string): Promise<T> {
   return JSON.parse(await fs.readFile(path.join(DATA_DIR, name), 'utf-8')) as T;

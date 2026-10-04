@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 import pytest
 from conftest import open_keys
@@ -180,3 +181,13 @@ def test_totals_convert_to_base_currency_and_skip_unvalued(blank: PrepStore) -> 
     assert totals.liabilities == 470_000
     assert totals.net_worth == 650_000
     assert totals.unvalued == 1
+
+
+def test_frontend_copy_of_the_data_is_up_to_date() -> None:
+    """The frontend deployed on its own reads frontend/data: it must match data/."""
+    root = Path(__file__).resolve().parent.parent
+    for name in ("clients.json", "settings.json"):
+        copy = root / "frontend" / "data" / name
+        assert copy.read_bytes() == (root / "data" / name).read_bytes(), (
+            f"{copy} is stale: run `node scripts/sync-data.mjs` in frontend/"
+        )
