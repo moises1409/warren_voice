@@ -489,3 +489,369 @@
     animation: none;
   }
 }
+
+/* The balance sheet as an island: a WebGL scene with HTML labels floating over it. */
+.isl-stage {
+  position: relative;
+  width: 100%;
+  height: clamp(340px, 46vw, 480px);
+  overflow: hidden;
+  background: radial-gradient(
+    ellipse at 50% 38%,
+    color-mix(in srgb, var(--wealth-bank) 14%, transparent),
+    transparent 70%
+  );
+}
+
+.isl-canvas {
+  position: absolute;
+  inset: 0;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.isl-canvas[data-dragging='true'] {
+  cursor: grabbing;
+}
+
+.isl-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.isl-overlay {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.isl-label,
+.isl-zone {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.isl-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.1rem 0.45rem;
+  border: 1px solid var(--border);
+  border-bottom: 2px solid var(--c);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--popover) 88%, transparent);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.35;
+  transition: opacity 0.2s;
+}
+
+.isl-label-name {
+  display: none;
+  max-width: 11rem;
+  overflow: hidden;
+  font-weight: 400;
+  text-overflow: ellipsis;
+}
+
+.isl-label[data-lit='true'] {
+  z-index: 1;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--foreground) 18%, transparent);
+}
+
+.isl-label[data-named='true'] .isl-label-name,
+.isl-label[data-lit='true'] .isl-label-name {
+  display: block;
+}
+
+.isl-label[data-dim='true'] {
+  opacity: 0.35;
+}
+
+.isl-label[data-unknown='true'] .isl-label-value {
+  color: var(--warning);
+}
+
+.isl-zone {
+  padding: 0.05rem 0.4rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--popover) 80%, transparent);
+  color: var(--muted-foreground);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.isl-zone[data-empty='true'] {
+  opacity: 0.5;
+}
+
+.isl-hint {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  color: var(--muted-foreground);
+  font-size: 0.6875rem;
+  pointer-events: none;
+}
+
+/* The balance sheet as a vault: piles of gold bars, with a caption under each pile. */
+.vlt-stage {
+  height: clamp(380px, 48vw, 500px);
+  background: radial-gradient(
+    ellipse at 50% 45%,
+    color-mix(in srgb, #f6c644 12%, transparent),
+    transparent 70%
+  );
+}
+
+.vlt-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: min(8rem, calc(var(--vlt-step, 116px) - 6px));
+  padding: 0.2rem 0.3rem 0.25rem;
+  border-top: 2px solid var(--c);
+  border-radius: 0 0 6px 6px;
+  background: color-mix(in srgb, var(--popover) 86%, transparent);
+  font-size: 0.6875rem;
+  line-height: 1.3;
+  text-align: center;
+  visibility: hidden;
+  pointer-events: auto;
+  transition:
+    opacity 0.2s,
+    box-shadow 0.2s;
+  will-change: transform;
+}
+
+.vlt-label[data-lit='true'] {
+  z-index: 1;
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--foreground) 20%, transparent);
+}
+
+.vlt-label[data-dim='true'] {
+  opacity: 0.35;
+}
+
+.vlt-label-value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.vlt-label-name {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--muted-foreground);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.vlt-label-debt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-top: 0.15rem;
+  border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.vlt-label-debt[data-lit='true'] {
+  background: var(--muted);
+}
+
+.vlt-label-debt-name {
+  overflow: hidden;
+  color: var(--muted-foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@keyframes vlt-changed {
+  0% {
+    background: color-mix(in srgb, var(--c) 45%, var(--popover));
+  }
+}
+
+.vlt-changed {
+  animation: vlt-changed 1.3s ease-out;
+}
+
+.vlt-legend {
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.9rem;
+  max-width: calc(100% - 7rem);
+  color: var(--muted-foreground);
+  font-size: 0.6875rem;
+  pointer-events: none;
+}
+
+.vlt-legend > span {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.vlt-legend-unit {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.vlt-swatch,
+.vlt-swatch-gold,
+.vlt-swatch-debt {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 0.7rem;
+  height: 0.4rem;
+  border-radius: 1px;
+}
+
+.vlt-swatch-gold {
+  background: #e9b52c;
+}
+
+.vlt-swatch-debt {
+  background: #4a4f5c;
+}
+
+.dark .vlt-swatch-debt {
+  background: #7b8296;
+}
+
+/* Income and expenses as a river: coins run along every branch. */
+.rvr-coin {
+  fill: #f6c644;
+  stroke: #9a6f12;
+  stroke-width: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vlt-changed {
+    animation: none;
+  }
+}
+
+/* The balance sheet as a mosaic: tiles whose area is their value. */
+.msc-tile {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 7px;
+  background: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--c) 92%, #fff),
+    color-mix(in srgb, var(--c) 74%, #000)
+  );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.28),
+    inset 0 -2px 0 rgb(0 0 0 / 0.18);
+  color: #fff;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+  animation: msc-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) backwards;
+  transition:
+    left 0.6s,
+    top 0.6s,
+    width 0.6s,
+    height 0.6s,
+    opacity 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+  transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes msc-in {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+}
+
+.msc-tile[data-lit='true'] {
+  z-index: 1;
+  transform: translateY(-3px) scale(1.012);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.28),
+    inset 0 -2px 0 rgb(0 0 0 / 0.18),
+    0 8px 22px color-mix(in srgb, var(--c) 45%, transparent);
+}
+
+.msc-tile[data-dim='true'] {
+  opacity: 0.4;
+}
+
+.msc-watermark {
+  position: absolute;
+  right: 4%;
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.msc-hatch,
+.msc-owed {
+  background-color: #3a3f4a;
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0 5px,
+    rgb(255 255 255 / 0.22) 5px 7px
+  );
+}
+
+.msc-owed {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: flex-end;
+  border-top: 2px solid rgb(255 255 255 / 0.75);
+  opacity: 0.92;
+}
+
+.msc-owed[data-lit='true'] {
+  background-color: #23262d;
+  opacity: 1;
+}
+
+.msc-owed-label {
+  overflow: hidden;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.6875rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@keyframes msc-changed {
+  0%,
+  40% {
+    filter: brightness(1.6);
+  }
+}
+
+.msc-changed {
+  animation: msc-changed 1.3s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .msc-tile,
+  .msc-changed {
+    animation: none;
+    transition: none;
+  }
+}

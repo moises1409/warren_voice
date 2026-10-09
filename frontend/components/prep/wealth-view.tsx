@@ -1,7 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { AnimatedNumber } from '@/components/prep/animated-number';
+import type { IslandItem } from '@/components/prep/island-3d';
+import { Mosaic } from '@/components/prep/mosaic';
+import { RiverFlow } from '@/components/prep/river-flow';
 import { CostOfInaction, taxesByCountry } from '@/components/prep/simulation';
 import { type Block, Towers3D, WEALTH_COLOR, type WealthColor } from '@/components/prep/towers-3d';
 import { cn } from '@/lib/shadcn/utils';
@@ -27,7 +31,27 @@ import {
   toBase,
 } from '@/lib/wealth';
 
-type View = 'visual' | 'table';
+// The island is a WebGL scene: loaded on demand, and never rendered on the server.
+const Island3D = dynamic(() => import('@/components/prep/island-3d').then((m) => m.Island3D), {
+  ssr: false,
+  loading: () => <div className="isl-stage" />,
+});
+
+const Vault3D = dynamic(() => import('@/components/prep/vault-3d').then((m) => m.Vault3D), {
+  ssr: false,
+  loading: () => <div className="isl-stage" />,
+});
+
+type View = 'vault' | 'mosaic' | 'river' | 'island' | 'visual' | 'table';
+
+const VIEW_LABEL: Record<View, string> = {
+  vault: 'Vault',
+  mosaic: 'Mosaic',
+  river: 'River',
+  island: 'Island',
+  visual: 'Visual',
+  table: 'Table',
+};
 
 /** What every row and block needs to light up together. */
 interface Highlight {
@@ -59,10 +83,12 @@ function Swatch({ color, className }: { color: WealthColor; className?: string }
 }
 
 /** The visual view remembers itself per section, so the banker's choice survives a reload. */
-function useStoredView(key: string): [View, (view: View) => void] {
-  const [view, setView] = useState<View>('visual');
+function useStoredView(key: string, views: readonly View[]): [View, (view: View) => void] {
+  const [view, setView] = useState<View>(views[0]);
   useEffect(() => {
-    if (window.localStorage.getItem(key) === 'table') setView('table');
+    const stored = window.localStorage.getItem(key) as View | null;
+    if (stored && views.includes(stored)) setView(stored);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
   return [
     view,
@@ -238,6 +264,7 @@ interface SectionProps {
   headline: Figure;
   figures: Figure[];
   view: View;
+  views: readonly View[];
   onView: (view: View) => void;
   /** Items whose details are not complete; shown on the Table tab, where the details are. */
   incomplete: number;
@@ -254,6 +281,7 @@ function Section({
   headline,
   figures,
   view,
+  views,
   onView,
   incomplete,
   folded,
@@ -301,7 +329,7 @@ function Section({
         </div>
 
         <div role="tablist" aria-label={`${title} view`} className="bg-muted flex rounded-lg p-0.5">
-          {(['visual', 'table'] as const).map((id) => (
+          {views.map((id) => (
             <button
               key={id}
               role="tab"
@@ -315,7 +343,7 @@ function Section({
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              {id === 'visual' ? 'Visual' : 'Table'}
+              {VIEW_LABEL[id]}
               {id === 'table' && incomplete > 0 && (
                 <span className="bg-warning/15 text-warning rounded-full px-1.5 text-xs font-medium">
                   {incomplete} incomplete
@@ -331,6 +359,10 @@ function Section({
 }
 
 // --- the view -----------------------------------------------------------------
+
+/** The first is what a banker sees before choosing. */
+const BALANCE_VIEWS = ['vault', 'mosaic', 'island', 'visual', 'table'] as const;
+const FLOW_VIEWS = ['river', 'island', 'visual', 'table'] as const;
 
 interface WealthViewProps {
   state: PrepState;
@@ -363,8 +395,8 @@ export function WealthView({
   const isFolded = (section: WealthSection) =>
     focusSection !== null && focusSection !== section && !opened.has(section);
   const unfold = (section: WealthSection) => () => setOpened((prev) => new Set(prev).add(section));
-  const [balanceView, setBalanceView] = useStoredView('warren.view.balance');
-  const [flowView, setFlowView] = useStoredView('warren.view.cashflow');
+  const [balanceView, setBalanceView] = useStoredView('warren.view.balance', BALANCE_VIEWS);
+  const [flowView, setFlowView] = useStoredView('warren.view.cashflow', FLOW_VIEWS);
 
   const totals = computeTotals(state, settings);
   const currency = settings.baseCurrency;
@@ -442,6 +474,36 @@ export function WealthView({
     label: label(l),
     value: base(l),
   }));
+  // The island: every asset as a building on its shore, every debt as an iron ball.
+  const islandItems: IslandItem[] = [
+    ...(
+      [
+        [atBank, 'bank', 'bank'],
+        [elsewhere, 'other', 'other'],
+        [nonBankable, 'land', 'illiquid'],
+      ] as const
+    ).flatMap(([assets, zone, color]) =>
+      assets.map((a) => ({
+        id: a.id,
+        kind: 'asset' as const,
+        type: a.type,
+        zone,
+        color,
+        label: label(a),
+        value: base(a),
+      }))
+    ),
+    ...state.liabilities.map((l) => ({
+      id: l.id,
+      kind: 'debt' as const,
+      type: l.type,
+      zone: 'land' as const,
+      color: 'debt' as const,
+      label: label(l),
+      value: base(l),
+      securedBy: l.securedByAssetId,
+    })),
+  ];
   const netWorthItem: ListItem = {
     id: 'net-worth',
     color: 'net',
@@ -479,6 +541,41 @@ export function WealthView({
     label: 'Funded from capital',
     value: -surplus,
   };
+
+  // The island of the year: income on one shore, expenses on the other, and in the pond
+  // between them what is left over or what capital has to add.
+  const flowIslandItems: IslandItem[] = [
+    ...(['income', 'expense'] as const).flatMap((direction) =>
+      flows(direction, false).map(
+        (f): IslandItem => ({
+          id: f.id,
+          kind: direction,
+          type: f.type,
+          zone: direction === 'income' ? 'bank' : 'other',
+          color: direction,
+          label: label(f),
+          value: base(f),
+        })
+      )
+    ),
+    ...(surplus === 0
+      ? []
+      : [
+          {
+            id: surplus > 0 ? 'surplus' : 'shortfall',
+            kind: 'store',
+            type: surplus > 0 ? 'surplus' : 'shortfall',
+            zone: 'pond',
+            color: surplus > 0 ? 'surplus' : 'shortfall',
+            label: surplus > 0 ? 'Surplus' : 'Funded from capital',
+            value: Math.abs(surplus),
+          } satisfies IslandItem,
+        ]),
+  ];
+
+  // The same picture two ways: gold bars of one size, or a building for each thing.
+  const BalancePicture =
+    balanceView === 'vault' ? Vault3D : balanceView === 'mosaic' ? Mosaic : Island3D;
 
   const assetRow = (a: Asset, color: WealthColor) => (
     <Row
@@ -583,10 +680,38 @@ export function WealthView({
               ]
         }
         view={balanceView}
+        views={BALANCE_VIEWS}
         onView={setBalanceView}
         incomplete={incomplete([...state.assets, ...state.liabilities])}
       >
-        {balanceView === 'visual' ? (
+        {balanceView === 'vault' || balanceView === 'mosaic' || balanceView === 'island' ? (
+          <>
+            <BalancePicture
+              items={islandItems}
+              zones={{
+                bank: `At ${settings.houseBank}`,
+                other: 'At other banks',
+                land: 'Non-bankable',
+              }}
+              currency={currency}
+              description={`Balance sheet: assets ${currency} ${formatNumber(totals.assets)}, liabilities ${currency} ${formatNumber(totals.liabilities)}, net worth ${currency} ${formatNumber(totals.netWorth)}.`}
+              changed={changed}
+              focus={focus}
+              hoverId={hoverId}
+              onHover={setHoverId}
+            />
+            <div className="grid grid-cols-1 gap-x-4 gap-y-4 border-t px-4 py-4 md:grid-cols-2">
+              <ItemList groups={assetGroups} highlight={highlight} />
+              <ItemList
+                groups={[
+                  { title: 'Liabilities', items: debtItems },
+                  { title: 'Equity', items: [netWorthItem] },
+                ]}
+                highlight={highlight}
+              />
+            </div>
+          </>
+        ) : balanceView === 'visual' ? (
           <div className={visualGrid}>
             <ItemList groups={assetGroups} highlight={highlight} />
             <Towers3D
@@ -702,15 +827,62 @@ export function WealthView({
           { label: 'Expenses', value: totals.recurringExpenses },
         ]}
         view={flowView}
+        views={FLOW_VIEWS}
         onView={setFlowView}
         incomplete={incomplete(state.cashFlows) + undated}
       >
-        {flowView === 'visual' ? (
+        {flowView !== 'table' ? (
           <>
             {incomeItems.length + expenseItems.length === 0 ? (
               <p className="text-muted-foreground px-5 py-6 text-sm">
                 No recurring income or expenses recorded yet.
               </p>
+            ) : flowView === 'river' ? (
+              <div className="px-3 py-2">
+                <RiverFlow
+                  sources={flowIslandItems.filter(
+                    (item) => item.kind === 'income' || item.type === 'shortfall'
+                  )}
+                  uses={flowIslandItems.filter(
+                    (item) => item.kind === 'expense' || item.type === 'surplus'
+                  )}
+                  currency={currency}
+                  description={`Income and expenses as a flow: recurring income ${currency} ${formatNumber(totals.recurringIncome)} a year, recurring expenses ${currency} ${formatNumber(totals.recurringExpenses)}.`}
+                  changed={changed}
+                  focus={focus}
+                  hoverId={hoverId}
+                  onHover={setHoverId}
+                />
+              </div>
+            ) : flowView === 'island' ? (
+              <>
+                <Island3D
+                  items={flowIslandItems}
+                  zones={{ bank: 'Income', other: 'Expenses' }}
+                  currency={currency}
+                  description={`Income and expenses as an island: recurring income ${currency} ${formatNumber(totals.recurringIncome)} a year, recurring expenses ${currency} ${formatNumber(totals.recurringExpenses)}.`}
+                  changed={changed}
+                  focus={focus}
+                  hoverId={hoverId}
+                  onHover={setHoverId}
+                />
+                <div className="grid grid-cols-1 gap-x-4 gap-y-4 border-t px-4 py-4 md:grid-cols-2">
+                  <ItemList
+                    groups={[
+                      { title: 'Income', items: incomeItems },
+                      { title: 'Gap', items: surplus < 0 ? [shortfallItem] : [] },
+                    ]}
+                    highlight={highlight}
+                  />
+                  <ItemList
+                    groups={[
+                      { title: 'Expenses', items: expenseItems },
+                      { title: 'Left over', items: surplus > 0 ? [surplusItem] : [] },
+                    ]}
+                    highlight={highlight}
+                  />
+                </div>
+              </>
             ) : (
               <div className={visualGrid}>
                 <ItemList
